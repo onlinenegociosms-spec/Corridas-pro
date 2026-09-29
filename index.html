@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<title>Corridas Pro</title>
+</head>
+<body>
+<div id="toast"></div>
+
+<section id="auth" class="screen">
+  <div class="auth-card">
+    <div class="logo">🚗</div>
+    <h1>Corridas Pro</h1>
+    <p class="muted">Agendamento e controle de custos para motorista.</p>
+    <div id="loginBox">
+      <h2>Entrar</h2>
+      <input id="loginEmail" type="email" placeholder="E-mail">
+      <input id="loginPass" type="password" placeholder="Senha">
+      <button class="primary" onclick="login()">Entrar</button>
+      <button class="linkbtn" onclick="showRegister()">Criar conta</button>
+      <p class="demo">Demo: crie sua conta no primeiro acesso.</p>
+    </div>
+    <div id="registerBox" class="hidden">
+      <h2>Criar conta</h2>
+      <input id="regName" placeholder="Seu nome">
+      <input id="regEmail" type="email" placeholder="E-mail">
+      <input id="regPass" type="password" placeholder="Senha (mín. 4 caracteres)">
+      <button class="primary" onclick="register()">Criar conta</button>
+      <button class="linkbtn" onclick="showLogin()">Já tenho conta</button>
+    </div>
+  </div>
+</section>
+
+<section id="app" class="hidden">
+<header class="topbar">
+  <div><strong>🚗 Corridas Pro</strong><small id="hello"></small></div>
+  <button class="iconbtn" onclick="logout()" title="Sair">↪</button>
+</header>
+
+<nav class="tabs">
+ <button class="tab active" data-page="home">🏠<span>Início</span></button>
+ <button class="tab" data-page="rides">📅<span>Corridas</span></button>
+ <button class="tab" data-page="calculator">💰<span>Custos</span></button>
+ <button class="tab" data-page="settings">⚙️<span>Config.</span></button>
+</nav>
+
+<main>
+<section id="page-home" class="page">
+  <div class="hero">
+    <div><span class="eyebrow">PAINEL DO MOTORISTA</span><h1>Seu dia, sob controle.</h1></div>
+    <button class="primary small" onclick="openRide()">+ Nova corrida</button>
+  </div>
+  <div class="cards">
+    <div class="stat"><span>Agendadas</span><b id="statRides">0</b></div>
+    <div class="stat"><span>Receita prevista</span><b id="statRevenue">R$ 0,00</b></div>
+    <div class="stat"><span>Km previstos</span><b id="statKm">0 km</b></div>
+    <div class="stat"><span>Lucro estimado</span><b id="statProfit">R$ 0,00</b></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><h2>Próximas corridas</h2><button class="linkbtn" onclick="go('rides')">Ver todas</button></div>
+    <div id="nextRides"></div>
+  </div>
+</section>
+
+<section id="page-rides" class="page hidden">
+ <div class="page-title"><div><span class="eyebrow">AGENDA</span><h1>Minhas corridas</h1></div><button class="primary small" onclick="openRide()">+ Agendar</button></div>
+ <div class="filters">
+   <button class="filter active" onclick="filterRides('all',this)">Todas</button>
+   <button class="filter" onclick="filterRides('agendada',this)">Agendadas</button>
+   <button class="filter" onclick="filterRides('concluida',this)">Concluídas</button>
+ </div>
+ <div id="ridesList"></div>
+</section>
+
+<section id="page-calculator" class="page hidden">
+ <div class="page-title"><div><span class="eyebrow">FINANCEIRO</span><h1>Calculadora de custos</h1></div></div>
+ <div class="grid2">
+  <div class="panel">
+   <h2>Dados da corrida</h2>
+   <label>Valor recebido (R$)<input id="cRevenue" type="number" step="0.01" value="30"></label>
+   <label>Distância total (km)<input id="cKm" type="number" step="0.1" value="20"></label>
+   <button class="primary" onclick="calculate()">Calcular</button>
+  </div>
+  <div class="panel result">
+   <span>Lucro estimado</span><strong id="calcProfit">R$ 0,00</strong>
+   <div class="resultrow"><span>Custo total</span><b id="calcCost">R$ 0,00</b></div>
+   <div class="resultrow"><span>Custo por km</span><b id="calcPerKm">R$ 0,00</b></div>
+   <div class="resultrow"><span>Lucro por km</span><b id="calcProfitKm">R$ 0,00</b></div>
+   <div class="resultrow"><span>Margem</span><b id="calcMargin">0%</b></div>
+  </div>
+ </div>
+ <div class="panel">
+  <h2>Seus custos</h2>
+  <p class="muted">Altere os valores em Configurações. Eles ficam salvos neste aparelho.</p>
+  <div class="cost-grid" id="costSummary"></div>
+ </div>
+</section>
+
+<section id="page-settings" class="page hidden">
+ <div class="page-title"><div><span class="eyebrow">CONFIGURAÇÕES</span><h1>Custos do veículo</h1></div></div>
+ <div class="panel">
+  <div class="grid2">
+   <label>Consumo (km por m³)<input id="sConsumption" type="number" step="0.1"></label>
+   <label>Preço do GNV (R$/m³)<input id="sFuel" type="number" step="0.01"></label>
+   <label>Manutenção (R$/km)<input id="sMaintenance" type="number" step="0.01"></label>
+   <label>Seguro mensal (R$)<input id="sInsurance" type="number" step="0.01"></label>
+   <label>IPVA anual (R$)<input id="sIpva" type="number" step="0.01"></label>
+   <label>Pneus / reserva mensal (R$)<input id="sTires" type="number" step="0.01"></label>
+   <label>Outros custos mensais (R$)<input id="sOther" type="number" step="0.01"></label>
+   <label>Km trabalhados por mês<input id="sMonthlyKm" type="number" step="1"></label>
+  </div>
+  <button class="primary" onclick="saveSettings()">Salvar configurações</button>
+ </div>
+ <div class="panel">
+  <h2>Perfil</h2>
+  <p id="profileText"></p>
+  <button class="danger" onclick="clearData()">Apagar dados deste aparelho</button>
+ </div>
+</section>
+</main>
+</section>
+
+<div id="rideModal" class="modal hidden">
+ <div class="modal-card">
+  <div class="modal-head"><h2>Nova corrida</h2><button class="iconbtn" onclick="closeRide()">✕</button></div>
+  <div class="grid2">
+   <label>Passageiro<input id="rPassenger" placeholder="Nome"></label>
+   <label>Telefone<input id="rPhone" placeholder="(22) 99999-9999"></label>
+   <label>Data<input id="rDate" type="date"></label>
+   <label>Horário<input id="rTime" type="time"></label>
+   <label>Embarque<input id="rPickup" placeholder="Local de embarque"></label>
+   <label>Destino<input id="rDestination" placeholder="Destino"></label>
+   <label>Distância total (km)<input id="rKm" type="number" step="0.1"></label>
+   <label>Valor combinado (R$)<input id="rValue" type="number" step="0.01"></label>
+  </div>
+  <label>Observações<textarea id="rNotes" placeholder="Informações adicionais"></textarea></label>
+  <button class="primary" onclick="saveRide()">Salvar corrida</button>
+ </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

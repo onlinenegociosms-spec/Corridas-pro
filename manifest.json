@@ -1,0 +1,10 @@
+{
+  "name":"Corridas Pro",
+  "short_name":"Corridas Pro",
+  "start_url":"./index.html",
+  "display":"standalone",
+  "background_color":"#f3f4f6",
+  "theme_color":"#111827",
+  "lang":"pt-BR",
+  "description":"Agendamento de corridas e calculadora de custos para motorista."
+}
